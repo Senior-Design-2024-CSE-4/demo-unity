@@ -6,30 +6,42 @@ using System.Text;
 using System.Threading;
 using UnityEngine;
 
+/// <summary>
+/// Class <c>Client</c> represents a client connection to the server.
+/// Data gets updated by predefined hertz, and can then be called with <c>GetCurrentData()</c>.
+/// <example>
+/// For example:
+/// <code>
+/// Client c = new Client();
+/// string message = c.GetCurrentData();
+/// </code>
+/// </example>
+/// </summary>
 public class Client : MonoBehaviour
 {
 
     private TcpClient tcpSocket;
     private Thread thread;
+    // The rate at which the client listens to the server
+    private double targetHz = 120.0;
 
+    private string currentData = "";
 
-    // Start is called before the first frame update
-    void Start()
+    public void SetHz(double hz)
     {
-        Connect();
+        this.targetHz = hz;
     }
 
-    // Update is called once per frame
-    void Update()
+    public double GetHz()
     {
-        
+        return this.targetHz;
     }
 
-    private void Connect()
+    public void Connect(string host, Int32 port)
     {
         try
         {
-            tcpSocket = new TcpClient("127.0.0.1", 12345);
+            tcpSocket = new TcpClient(host, port);
             thread = new Thread( new ThreadStart(Listen));
             thread.IsBackground = true;
             thread.Start();
@@ -43,25 +55,52 @@ public class Client : MonoBehaviour
 
     private void Listen()
     {
-        Byte[] bytes = new Byte[1024];
+        Byte[] buffer = new Byte[1024];
+        double update_time = 1.0/targetHz;
+        DateTime last_time = DateTime.Now;
         while (true)
         {
+            DateTime current_time = DateTime.Now;
             // Get a stream object for reading 				
-            using (NetworkStream stream = tcpSocket.GetStream()) { 					
-                int length; 					
-                // Read incomming stream into byte arrary. 					
-                while ((length = stream.Read(bytes, 0, bytes.Length)) != 0) { 						
-                    var incommingData = new byte[length]; 						
-                    Array.Copy(bytes, 0, incommingData, 0, length); 						
-                    // Convert byte array to string message. 						
-                    string serverMessage = Encoding.ASCII.GetString(incommingData); 						
-                    Debug.Log("server message received as: " + serverMessage); 					
-                } 				
+            using (NetworkStream stream = tcpSocket.GetStream()) 
+            { 					
+                if ((current_time - last_time).TotalSeconds < update_time)
+                {
+                    Debug.Log("flush");
+                    stream.Read(buffer, 0, buffer.Length);
+                }
+                else
+                {
+                    last_time = current_time;
+                    
+                    int length; 					
+                    // Read incomming stream into byte arrary. 					
+                    while ((length = stream.Read(buffer, 0, buffer.Length)) != 0) 
+                    { 						
+                        var incommingData = new byte[length]; 						
+                        Array.Copy(buffer, 0, incommingData, 0, length); 						
+                        // Convert byte array to string message. 						
+                        string serverMessage = Encoding.ASCII.GetString(incommingData); 						
+                        Debug.Log("server message received as: " + serverMessage); 		
+                        lock (this.currentData)
+                        {
+                            this.currentData = serverMessage;
+                        }			
+                    } 	
+                }			
             } 	
         }
     }
 
-    private void Send(string message)
+    public string GetCurrentData()
+    {
+        lock (this.currentData)
+        {
+            return this.currentData;
+        }
+    }
+
+    public void Send(string message)
     {
         if (tcpSocket == null) {             
 			return;         
@@ -74,7 +113,7 @@ public class Client : MonoBehaviour
 				byte[] clientMessageAsByteArray = Encoding.ASCII.GetBytes(message); 				
 				// Write byte array to socketConnection stream.                 
 				stream.Write(clientMessageAsByteArray, 0, clientMessageAsByteArray.Length);                 
-				Debug.Log("Client sent his message - should be received by server");             
+				Debug.Log("Client sent: " + message);             
 			}         
 		} 		
 		catch (SocketException socketException) {             
