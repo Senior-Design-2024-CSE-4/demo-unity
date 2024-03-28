@@ -24,6 +24,11 @@ public class Player : MonoBehaviour
         c.Send(angle.ToString());
     }
 
+    void OnApplicationQuit()
+    {
+        c.Close();
+    }
+
     public void ConnectToServer(string host, Int32 port)
     {
         this.c = new Client();

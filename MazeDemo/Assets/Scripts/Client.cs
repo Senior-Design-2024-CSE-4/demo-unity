@@ -27,6 +27,11 @@ public class Client
 
     private string currentData = "";
 
+    public void Close()
+    {
+        this.tcpSocket.Close();
+    }
+
     public void SetHz(double hz)
     {
         this.targetHz = hz;
@@ -113,7 +118,7 @@ public class Client
 				byte[] clientMessageAsByteArray = Encoding.ASCII.GetBytes(message); 				
 				// Write byte array to socketConnection stream.                 
 				stream.Write(clientMessageAsByteArray, 0, clientMessageAsByteArray.Length);                 
-				// Debug.Log("Client sent: " + message);             
+				Debug.Log("Client sent: " + message);             
 			}         
 		} 		
 		catch (SocketException socketException) {             
