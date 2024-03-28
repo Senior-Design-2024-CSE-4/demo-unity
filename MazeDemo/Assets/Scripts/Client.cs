@@ -17,7 +17,7 @@ using UnityEngine;
 /// </code>
 /// </example>
 /// </summary>
-public class Client : MonoBehaviour
+public class Client
 {
 
     private TcpClient tcpSocket;
@@ -113,7 +113,7 @@ public class Client : MonoBehaviour
 				byte[] clientMessageAsByteArray = Encoding.ASCII.GetBytes(message); 				
 				// Write byte array to socketConnection stream.                 
 				stream.Write(clientMessageAsByteArray, 0, clientMessageAsByteArray.Length);                 
-				Debug.Log("Client sent: " + message);             
+				// Debug.Log("Client sent: " + message);             
 			}         
 		} 		
 		catch (SocketException socketException) {             

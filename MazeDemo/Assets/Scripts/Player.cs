@@ -7,6 +7,8 @@ public class Player : MonoBehaviour
 {
     Client c;
     int num = 0;
+
+    private Vector3 goal;
     
     // Start is called before the first frame update
     void Start()
@@ -17,8 +19,9 @@ public class Player : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        float angle = GetAngleToGoal();
+        Debug.Log(angle);
         string data = c.GetCurrentData();
-        Debug.Log(data);
         c.Send("hello:" + num.ToString());
         this.num++;
     }
@@ -27,5 +30,26 @@ public class Player : MonoBehaviour
     {
         this.c = new Client();
         this.c.Connect(host, port);
+    }
+
+    public void SetGoal(Transform t)
+    {
+        this.goal = t.position;
+    }
+
+    private float GetAngleToGoal()
+    {
+        Vector3 forward = this.gameObject.transform.forward;
+        Vector3 targetDir = goal - this.gameObject.transform.position;
+        float angle = Vector3.Angle(targetDir, forward);
+        if (Vector3.Cross(forward, targetDir).y < 0)
+        {
+            Debug.Log("Left");
+        } 
+        else
+        {
+            Debug.Log("Right");
+        }
+        return angle;
     }
 }

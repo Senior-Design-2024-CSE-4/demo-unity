@@ -10,10 +10,12 @@ public class MazeContainer : MonoBehaviour
     public GameObject postPrefab;
     public GameObject wallPrefab;
     public GameObject playerPrefab;
+    public GameObject goalPrefab;
     private GameObject[] posts;
     private GameObject[] verticals;
     private GameObject[] horizontals;
     private GameObject player;
+    private GameObject goal;
 
     // Dimensions
     public int width;
@@ -41,6 +43,8 @@ public class MazeContainer : MonoBehaviour
         RenderWalls();
         Debug.Log("Walls rendered.");
         SpawnPlayer(0, 0);
+        SpawnGoal(0, 0);
+        this.player.GetComponent<Player>().SetGoal(this.goal.transform);
     }
 
     // Update is called once per frame
@@ -97,5 +101,9 @@ public class MazeContainer : MonoBehaviour
     void SpawnPlayer(int x, int y)
     {
         this.player = Instantiate(this.playerPrefab, new Vector3((x + 0.5f) * (this.cellSize + this.wallWidth), this.wallHeight / 2, (y + 0.5f) * (this.cellSize + this.wallWidth)), Quaternion.identity);
+    }
+    void SpawnGoal(int x, int y)
+    {
+        this.goal = Instantiate(this.goalPrefab, new Vector3((x + 0.5f) * (this.cellSize + this.wallWidth), this.wallHeight / 2, (y + 0.5f) * (this.cellSize + this.wallWidth)), Quaternion.identity);
     }
 }
