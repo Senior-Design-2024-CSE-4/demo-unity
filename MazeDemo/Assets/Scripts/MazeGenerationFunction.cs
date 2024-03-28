@@ -35,6 +35,7 @@ public class DFSGeneration: MazeGenerationFunction
             int cell = stack.Pop();
             Debug.Log("Examining cell " + cell);
             List<int> neighbors = GetNeighbors(cell);
+            Debug.Log(neighbors.Count);
             if (neighbors.Count > 0)
             {
                 stack.Push(cell);
@@ -50,28 +51,35 @@ public class DFSGeneration: MazeGenerationFunction
     private void RemoveWall(int c1, int c2)
     {
         (int, int) p1 = Index2Point(c1);
+        Debug.Log(p1);
         (int, int) p2 = Index2Point(c2);
+        Debug.Log(p2);
 
         if (p2.Item2 > p1.Item2)
         {
+            Debug.Log("TOP " + p1.Item1 + " " + p1.Item2);
             this.maze.SetTopWall(p1.Item1, p1.Item2, 0);
             return;
         }
 
         if (p2.Item2 < p1.Item2)
         {
+            Debug.Log("BOTTOM " + p1.Item1 + " " + p1.Item2);
             this.maze.SetBottomWall(p1.Item1, p1.Item2, 0);
             return;
         }
 
         if (p2.Item1 > p1.Item1)
         {
+            Debug.Log("RIGHT " + p1.Item1 + " " + p1.Item2);
             this.maze.SetRightWall(p1.Item1, p1.Item2, 0);
             return;
         }
 
-        if (p2.Item1 > p1.Item1)
+        if (p2.Item1 < p1.Item1)
         {
+
+            Debug.Log("LEFT " + p1.Item1 + " " + p1.Item2);
             this.maze.SetLeftWall(p1.Item1, p1.Item2, 0);
             return;
         }

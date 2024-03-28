@@ -62,7 +62,6 @@ public class MazeContainer : MonoBehaviour
             {
                 posts[(this.width + 1) * y + x] = Instantiate(this.postPrefab, new Vector3(x * (this.cellSize + this.wallWidth), this.wallHeight / 2, y * (this.cellSize + this.wallWidth)), Quaternion.identity);
                 posts[(this.width + 1) * y + x].transform.localScale = new Vector3(this.wallWidth, this.wallHeight, this.wallWidth);
-                Debug.Log("Initialized post " + x + " " + y + ".");
             }
         }
     }
@@ -75,25 +74,25 @@ public class MazeContainer : MonoBehaviour
         {
             for (int y = 0; y < this.height; y++)
             {
-                if (x == 0 && this.data.GetBottomWall(x, y) != 0)
+                if (y == 0 && this.data.GetBottomWall(x, y) != 0)
                 {
-                    this.verticals[y * this.width + x] = Instantiate(this.wallPrefab, new Vector3(x * (this.cellSize + this.wallWidth), this.wallHeight / 2, (y + 0.5f) * (this.cellSize + this.wallWidth)), Quaternion.identity);
-                    this.verticals[y * this.width + x].transform.localScale = new Vector3(this.wallWidth, this.wallHeight, this.wallHeight);
+                    this.horizontals[y * this.width + x] = Instantiate(this.wallPrefab, new Vector3((x + 0.5f) * (this.cellSize + this.wallWidth), this.wallHeight / 2, y * (this.cellSize + this.wallWidth)), Quaternion.identity);
+                    this.horizontals[y * this.width + x].transform.localScale = new Vector3(this.cellSize, this.wallHeight, this.wallWidth);
                 }
-                if (y == 0 && this.data.GetLeftWall(x, y) != 0)
+                if (x == 0 && this.data.GetLeftWall(x, y) != 0)
                 {
-                    this.horizontals[(this.width + 1) * y + x] = Instantiate(this.wallPrefab, new Vector3((x + 0.5f) * (this.cellSize + this.wallWidth), this.wallHeight / 2, y * (this.cellSize + this.wallWidth)), Quaternion.identity);
-                    this.horizontals[(this.width + 1) * y + x].transform.localScale = new Vector3(this.cellSize, this.wallHeight, this.wallWidth);
+                    this.verticals[(this.width + 1) * y + x] = Instantiate(this.wallPrefab, new Vector3(x * (this.cellSize + this.wallWidth), this.wallHeight / 2, (y + 0.5f) * (this.cellSize + this.wallWidth)), Quaternion.identity);
+                    this.verticals[(this.width + 1) * y + x].transform.localScale = new Vector3(this.wallWidth, this.wallHeight, this.cellSize);
                 }
                 if (this.data.GetTopWall(x, y) != 0)
                 {
-                    this.verticals[(y + 1) * this.width + x] = Instantiate(this.wallPrefab, new Vector3((x + 1) * (this.cellSize + this.wallWidth), this.wallHeight / 2, (y + 0.5f) * (this.cellSize + this.wallWidth)), Quaternion.identity);
-                    this.verticals[(y + 1) * this.width + x].transform.localScale = new Vector3(this.wallWidth, this.wallHeight, this.wallHeight);
+                    this.horizontals[(y + 1) * this.width + x] = Instantiate(this.wallPrefab, new Vector3((x + 0.5f) * (this.cellSize + this.wallWidth), this.wallHeight / 2, (y + 1) * (this.cellSize + this.wallWidth)), Quaternion.identity);
+                    this.horizontals[(y + 1) * this.width + x].transform.localScale = new Vector3(this.cellSize, this.wallHeight, this.wallWidth);
                 }
                 if (this.data.GetRightWall(x, y) != 0)
                 {
-                    this.horizontals[(this.width + 1) * y + x + 1] = Instantiate(this.wallPrefab, new Vector3((x + 0.5f) * (this.cellSize + this.wallWidth), this.wallHeight / 2, (y + 1) * (this.cellSize + this.wallWidth)), Quaternion.identity);
-                    this.horizontals[(this.width + 1) * y + x + 1].transform.localScale = new Vector3(this.cellSize, this.wallHeight, this.wallWidth);
+                    this.verticals[(this.width + 1) * y + x + 1] = Instantiate(this.wallPrefab, new Vector3((x + 1) * (this.cellSize + this.wallWidth), this.wallHeight / 2, (y + 0.5f) * (this.cellSize + this.wallWidth)), Quaternion.identity);
+                    this.verticals[(this.width + 1) * y + x + 1].transform.localScale = new Vector3(this.wallWidth, this.wallHeight, this.cellSize);
                 }
             }
         }
