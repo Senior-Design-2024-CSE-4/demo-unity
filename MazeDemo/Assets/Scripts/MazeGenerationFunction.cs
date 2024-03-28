@@ -28,6 +28,7 @@ public class DFSGeneration: MazeGenerationFunction
 
         Stack<int> stack = new Stack<int>();
         stack.Push(Point2Index(startX, startY));
+        this.cells[Point2Index(startX, startY)] = 1;
 
         while (stack.Count > 0)
         {
@@ -39,6 +40,8 @@ public class DFSGeneration: MazeGenerationFunction
                 stack.Push(cell);
                 int index = Random.Range(0, neighbors.Count);
                 stack.Push(neighbors[index]);
+                this.cells[neighbors[index]] = 1;
+                Debug.Log("Adding cell " + neighbors[index]);
                 RemoveWall(cell, neighbors[index]);
             }
         }
@@ -115,6 +118,6 @@ public class DFSGeneration: MazeGenerationFunction
 
     private bool ValidCell(int x, int y)
     {
-        return this.maze.ValidCoordinate(x, y) && this.cells[Point2Index(x, y)] == 0;
+        return this.maze.ValidCoordinate(x, y) && (this.cells[Point2Index(x, y)] == 0);
     }
 }
