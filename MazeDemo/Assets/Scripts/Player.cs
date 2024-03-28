@@ -20,10 +20,8 @@ public class Player : MonoBehaviour
     void Update()
     {
         float angle = GetAngleToGoal();
-        Debug.Log(angle);
-        string data = c.GetCurrentData();
-        c.Send("hello:" + num.ToString());
-        this.num++;
+        Debug.Log(angle.ToString());
+        c.Send(angle.ToString());
     }
 
     public void ConnectToServer(string host, Int32 port)
@@ -45,11 +43,12 @@ public class Player : MonoBehaviour
         if (Vector3.Cross(forward, targetDir).y < 0)
         {
             Debug.Log("Left");
+            return 360f - angle;
         } 
         else
         {
             Debug.Log("Right");
+            return angle;
         }
-        return angle;
     }
 }
