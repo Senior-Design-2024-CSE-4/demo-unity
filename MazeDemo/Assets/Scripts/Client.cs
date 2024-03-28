@@ -114,7 +114,7 @@ public class Client
 			NetworkStream stream = tcpSocket.GetStream(); 			
 			if (stream.CanWrite) {                 				
 				// Convert string message to byte array.                 
-				byte[] clientMessageAsByteArray = Encoding.ASCII.GetBytes(message); 				
+				byte[] clientMessageAsByteArray = Encoding.ASCII.GetBytes("unity:" + message); 				
 				// Write byte array to socketConnection stream.                 
 				stream.Write(clientMessageAsByteArray, 0, clientMessageAsByteArray.Length);                 
 				Debug.Log("Client sent: " + message);             
