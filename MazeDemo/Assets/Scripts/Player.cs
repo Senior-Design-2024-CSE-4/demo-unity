@@ -24,7 +24,7 @@ public class Player : MonoBehaviour
         c.Send(angle.ToString());
     }
 
-    void OnApplicationQuit()
+    void UnloadPlayer()
     {
         c.Close();
     }
@@ -34,7 +34,7 @@ public class Player : MonoBehaviour
         this.c = new Client();
         this.c.Connect(host, port);
         this.c.Send("s:unity");
-        this.c.Send("belt");
+        this.c.Send("ubelt");
     }
 
     public void SetGoal(Transform t)
