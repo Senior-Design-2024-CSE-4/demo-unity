@@ -33,6 +33,8 @@ public class Player : MonoBehaviour
     {
         this.c = new Client();
         this.c.Connect(host, port);
+        this.c.Send("s:unity");
+        this.c.Send("belt");
     }
 
     public void SetGoal(Transform t)

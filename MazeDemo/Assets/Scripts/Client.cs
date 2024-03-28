@@ -50,7 +50,6 @@ public class Client
             thread = new Thread( new ThreadStart(Listen));
             thread.IsBackground = true;
             thread.Start();
-            Send("b:unity");
         }
         catch (Exception e)
         {
