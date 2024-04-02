@@ -17,15 +17,26 @@ using UnityEngine;
 /// </code>
 /// </example>
 /// </summary>
-public class Client : MonoBehaviour
+public class Client
 {
 
     private TcpClient tcpSocket;
     private Thread thread;
     // The rate at which the client listens to the server
     private double targetHz = 120.0;
+    private double UpdateTime
+    {
+        get => 1.0/targetHz;
+    }
+    private DateTime lastsend = DateTime.Now;
+    private DateTime lastreceive = DateTime.Now;
 
     private string currentData = "";
+
+    public void Close()
+    {
+        this.tcpSocket.Close();
+    }
 
     public void SetHz(double hz)
     {
@@ -45,7 +56,6 @@ public class Client : MonoBehaviour
             thread = new Thread( new ThreadStart(Listen));
             thread.IsBackground = true;
             thread.Start();
-            Send("b:unity");
         }
         catch (Exception e)
         {
@@ -56,22 +66,20 @@ public class Client : MonoBehaviour
     private void Listen()
     {
         Byte[] buffer = new Byte[1024];
-        double update_time = 1.0/targetHz;
-        DateTime last_time = DateTime.Now;
         while (true)
         {
             DateTime current_time = DateTime.Now;
             // Get a stream object for reading 				
             using (NetworkStream stream = tcpSocket.GetStream()) 
             { 					
-                if ((current_time - last_time).TotalSeconds < update_time)
+                if ((current_time - this.lastreceive).TotalSeconds < this.UpdateTime)
                 {
                     Debug.Log("flush");
                     stream.Read(buffer, 0, buffer.Length);
                 }
                 else
                 {
-                    last_time = current_time;
+                    this.lastreceive = current_time;
                     
                     int length; 					
                     // Read incomming stream into byte arrary. 					
@@ -104,7 +112,12 @@ public class Client : MonoBehaviour
     {
         if (tcpSocket == null) {             
 			return;         
-		}  		
+		}
+        DateTime current_time = DateTime.Now;
+        if ((current_time - this.lastsend).TotalSeconds < this.UpdateTime)
+        {
+            return;
+        }
 		try { 			
 			// Get a stream object for writing. 			
 			NetworkStream stream = tcpSocket.GetStream(); 			
