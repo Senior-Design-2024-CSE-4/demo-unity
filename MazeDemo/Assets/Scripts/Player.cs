@@ -6,7 +6,6 @@ using UnityEngine;
 public class Player : MonoBehaviour
 {
     Client c;
-    int num = 0;
 
     private Vector3 goal;
     
