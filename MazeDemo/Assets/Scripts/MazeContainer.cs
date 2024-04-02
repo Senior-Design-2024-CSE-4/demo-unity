@@ -26,8 +26,8 @@ public class MazeContainer : MonoBehaviour
     float wallHeight = 5.0f;
 
     // Data
-    MazeData data;
-    MazeGenerationFunction gen;
+    private MazeData data;
+    private MazeGenerationFunction gen;
 
     
     // Start is called before the first frame update
