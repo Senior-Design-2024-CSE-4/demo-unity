@@ -159,8 +159,8 @@ public class Player : MonoBehaviour
             return;
         }
 
-        Debug.Log("unity:" + surround + "," + mode + "," + angle.ToString("000") + "," + intensity.ToString("000"));
-        c.Send("unity:" + surround + "," + mode + "," + angle.ToString("000") + "" + intensity.ToString("000"));
+        Debug.Log(surround + "," + mode + "," + angle.ToString("000") + "," + intensity.ToString("000"));
+        c.Send(surround + "," + mode + "," + angle.ToString("000") + "," + intensity.ToString("000"));
 
     }
 }
