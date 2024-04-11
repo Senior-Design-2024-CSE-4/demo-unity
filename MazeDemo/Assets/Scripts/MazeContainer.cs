@@ -28,7 +28,6 @@ public class MazeContainer : MonoBehaviour
     // Data
     private MazeData data;
     private MazeGenerationFunction gen;
-
     
     // Start is called before the first frame update
     void Start()
