@@ -8,6 +8,7 @@ public class Player : MonoBehaviour
     Client c;
 
     private Vector3 goal;
+    private float maxDistance;
 
     // 0 is for single direction, 1 is for all direction
     private int surroundMode;
@@ -32,15 +33,21 @@ public class Player : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        int angle = 0;
+        int intensity = 100;
         switch (this.navigationMode)
         {
             case 0:
-                float angle = GetAngleToGoal();
-                Send(surroundMode, beltMode, (int)angle, 100);
+                angle = GetAngleToGoal();
+                Send(surroundMode, beltMode, angle, intensity);
                 break;
             case 1:
+                intensity = GetDistanceIntensity();
+                Send(surroundMode, beltMode, angle, intensity);
                 break;
             case 2:
+                angle = GetAngleToNorth();
+                Send(surroundMode, beltMode, angle, intensity);
                 break;
             case 3:
                 break;
@@ -67,6 +74,11 @@ public class Player : MonoBehaviour
     {
         this.goal = t.position;
     }
+
+    public void SetMaxDistance(float d)
+    {
+        this.maxDistance = d;
+    }
     
     public void SetSurroundMode(int surroundMode)
     {
@@ -82,26 +94,45 @@ public class Player : MonoBehaviour
         this.beltMode = beltMode;
     }
 
-    private float GetAngleToGoal()
+    private int GetAngleToGoal()
     {
         Vector3 forward = this.gameObject.transform.forward;
         Vector3 targetDir = goal - this.gameObject.transform.position;
         float angle = Vector3.Angle(targetDir, forward);
         if (Vector3.Cross(forward, targetDir).y < 0)
         {
-            Debug.Log("Left");
-            return 360f - angle;
+            return (int)(360f - angle);
         } 
         else
         {
-            Debug.Log("Right");
-            return angle;
+            return (int)angle;
+        }
+    }
+
+    private int GetDistanceIntensity()
+    {
+        Vector3 difference = goal - this.gameObject.transform.position;
+        float distance = difference.magnitude;
+        return (int)(100f * distance / maxDistance);
+    }
+
+    private int GetAngleToNorth()
+    {
+        Vector3 forward = this.gameObject.transform.forward;
+        Vector3 targetDir = Vector3.forward;
+        float angle = Vector3.Angle(targetDir, forward);
+        if (Vector3.Cross(forward, targetDir).y < 0)
+        {
+            return (int)(360f - angle);
+        } 
+        else
+        {
+            return (int)angle;
         }
     }
 
     private void Send(int surround, int mode, int angle, int intensity)
     {
-        string toSend = "";
         // Either 0 or 1; 0 is for single direction, 1 is for all directions
         if (surround < 0 || surround > 1)
         {

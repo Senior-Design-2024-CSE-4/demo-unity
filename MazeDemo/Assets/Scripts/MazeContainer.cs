@@ -44,6 +44,8 @@ public class MazeContainer : MonoBehaviour
         SpawnPlayer(0, 0);
         SpawnGoal(0, 0);
         this.player.GetComponent<Player>().SetGoal(this.goal.transform);
+        Vector3 distance = new Vector3((cellSize + wallWidth) * this.width + wallWidth, 0, (cellSize + wallWidth) * this.height + wallWidth);
+        this.player.GetComponent<Player>().SetMaxDistance(distance.magnitude);
     }
 
     // Update is called once per frame
