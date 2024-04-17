@@ -6,11 +6,12 @@ public class MazeContainer : MonoBehaviour
 {
     
     // Objects
-    Plane floor;
+    public GameObject floorPrefab;
     public GameObject postPrefab;
     public GameObject wallPrefab;
     public GameObject playerPrefab;
     public GameObject goalPrefab;
+    GameObject floor;
     private GameObject[] posts;
     private GameObject[] verticals;
     private GameObject[] horizontals;
@@ -32,7 +33,9 @@ public class MazeContainer : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        this.floor = new Plane(Vector3.up, 0f);
+        this.floor = Instantiate(this.floorPrefab, new Vector3(((cellSize + wallWidth) * this.width + wallWidth) / 2, -0.5f, ((cellSize + wallWidth) * this.height + wallWidth) / 2), Quaternion.identity);
+        this.floor.transform.localScale = new Vector3((cellSize + wallWidth) * this.width + wallWidth, 1.0f, (cellSize + wallWidth) * this.height + wallWidth);
+        Debug.Log("Floor generated.");
         this.data = new MazeData(this.width, this.height);
         this.gen = new DFSGeneration();
         gen.Generate(this.data, 0, 0);
@@ -42,7 +45,7 @@ public class MazeContainer : MonoBehaviour
         RenderWalls();
         Debug.Log("Walls rendered.");
         SpawnPlayer(0, 0);
-        SpawnGoal(0, 0);
+        SpawnGoal(9, 9);
         this.player.GetComponent<Player>().SetGoal(this.goal.transform);
         Vector3 distance = new Vector3((cellSize + wallWidth) * this.width + wallWidth, 0, (cellSize + wallWidth) * this.height + wallWidth);
         this.player.GetComponent<Player>().SetMaxDistance(distance.magnitude);
