@@ -6,6 +6,7 @@ using UnityEngine;
 public class Player : MonoBehaviour
 {
     Client c;
+    private bool readyToSend;
 
     private Vector3 goal;
     private float maxDistance;
@@ -24,6 +25,7 @@ public class Player : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        readyToSend = false;
         ConnectToServer("127.0.0.1", 12345);
         this.surroundMode = 0;
         this.beltMode = 1;
@@ -60,7 +62,7 @@ public class Player : MonoBehaviour
         }
     }
 
-    void UnloadPlayer()
+    void OnDestroy()
     {
         c.Close();
     }
@@ -71,6 +73,7 @@ public class Player : MonoBehaviour
         this.c.Connect(host, port);
         this.c.Send("s:unity");
         this.c.Send("ubelt");
+        readyToSend = true;
     }
 
     public void SetGoal(Transform t)
@@ -160,7 +163,10 @@ public class Player : MonoBehaviour
         }
 
         Debug.Log(surround + "," + mode + "," + angle.ToString("000") + "," + intensity.ToString("000"));
-        c.Send(surround + "," + mode + "," + angle.ToString("000") + "," + intensity.ToString("000"));
+        if (readyToSend)
+        {
+            c.Send(surround + "," + mode + "," + angle.ToString("000") + "," + intensity.ToString("000"));
+        }
 
     }
 }

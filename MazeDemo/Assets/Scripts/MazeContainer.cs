@@ -247,5 +247,6 @@ public class MazeContainer : MonoBehaviour
     {
         this.goal.transform.position = new Vector3((x + 0.5f) * (this.cellSize + this.wallWidth), 2f, (y + 0.5f) * (this.cellSize + this.wallWidth));
         this.goal.transform.rotation = Quaternion.identity;
+        this.player.GetComponent<Player>().SetGoal(this.goal.transform);
     }
 }
