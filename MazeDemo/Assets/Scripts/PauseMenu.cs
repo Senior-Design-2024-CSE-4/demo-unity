@@ -8,6 +8,7 @@ public class PauseMenu : MonoBehaviour
     public static bool paused;
 
     public GameObject pauseUI;
+    public GameObject maze;
     
     // Start is called before the first frame update
     void Start()
@@ -32,7 +33,8 @@ public class PauseMenu : MonoBehaviour
     public void Restart()
     {
         Debug.Log("Restarting maze...");
-        SceneManager.LoadScene("Maze");
+        maze.GetComponent<MazeContainer>().RestartMaze();
+        Resume();
     }
 
 

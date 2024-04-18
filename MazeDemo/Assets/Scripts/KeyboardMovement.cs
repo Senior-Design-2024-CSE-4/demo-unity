@@ -5,47 +5,57 @@ using UnityEngine;
 public class KeyboardMovement : MonoBehaviour
 {
     public CharacterController controller;
-    public float gravity = -9.81f;
 
-    public float speed = 12f;
+    // Jump variables
 
-    private Vector3 velocity;
-    public float jumpHeight = 1f;
+    private Vector3 verticalMovement;
+    private float jumpHeight = 1f;
+    private float gravity = -9.81f;
+
+    // Movement variables
+
+    private Vector3 horizontalMovement;
+    private float speed = 5f;
+    private float sprintMultiplier = 2f;
 
     // Update is called once per frame
     void Update()
     {
+        // Only calculate movement when not paused
         if (!PauseMenu.paused)
         {
-            // Receive directional input from the player - these are decided by AWSD
-            // A and D
+            // Receive directional input from the player
             float x = Input.GetAxis("Horizontal");
-            // W and S (vertical refers to forward and backwards rather than up and down)
             float z = Input.GetAxis("Vertical");
 
-            // Generates a vector that gets directional input based on the above
-            // Note: transform is a relative 
-            Vector3 motionVector = transform.right * x + transform.forward * z;
-            motionVector *= speed;
-
-            // Jump
-
-            if(controller.isGrounded && velocity.y < 0)
+            horizontalMovement = transform.right * x + transform.forward * z;
+            horizontalMovement = horizontalMovement.normalized;
+            horizontalMovement *= speed;
+            if (Input.GetKey(KeyCode.LeftShift))
             {
-                velocity.y = -2f;
+                Debug.Log("Sprinting");
+                horizontalMovement *= sprintMultiplier;
             }
 
-            if(Input.GetButton("Jump") && controller.isGrounded)
+            if (controller.isGrounded)
             {
-                velocity.y = Mathf.Sqrt(jumpHeight * -2 * gravity);
+
+                // Apply constant downward force to stay grounded
+                if (verticalMovement.y < 0)
+                {
+                    verticalMovement.y = -2f;
+                }
+
+                if (Input.GetButton("Jump"))
+                {
+                    verticalMovement.y = Mathf.Sqrt(jumpHeight * -2 * gravity); 
+                }
             }
-            else {
-                Debug.Log("Not grounded");
-            }
-            velocity.y += gravity * Time.deltaTime;
+            Debug.Log(horizontalMovement);
+            verticalMovement.y += gravity * Time.deltaTime;
             // Move the controller in the direction specified above (position is relative to the direction the user is facing)
-            controller.Move(motionVector * Time.deltaTime);
-            controller.Move(velocity * Time.deltaTime);
+            controller.Move(horizontalMovement * Time.deltaTime);
+            controller.Move(verticalMovement * Time.deltaTime);
         }
     }
 }

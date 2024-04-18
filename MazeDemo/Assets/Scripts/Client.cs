@@ -5,18 +5,6 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using UnityEngine;
-
-/// <summary>
-/// Class <c>Client</c> represents a client connection to the server.
-/// Data gets updated by predefined hertz, and can then be called with <c>GetCurrentData()</c>.
-/// <example>
-/// For example:
-/// <code>
-/// Client c = new Client();
-/// string message = c.GetCurrentData();
-/// </code>
-/// </example>
-/// </summary>
 public class Client
 {
 

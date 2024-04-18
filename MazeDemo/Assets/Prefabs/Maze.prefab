@@ -45,6 +45,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   floorPrefab: {fileID: 481133034488653896, guid: 0bb3e74fa004543fdb8e88563e515faa, type: 3}
+  ceilingPrefab: {fileID: 620600287526627193, guid: b365656005b65b5499661933395721f6, type: 3}
   postPrefab: {fileID: 8785952496509668523, guid: 9923e4f5b09b64714ad4c4b03aa91470, type: 3}
   wallPrefab: {fileID: 8785952496509668523, guid: e02413d4d89af465ab72867d5981d22c, type: 3}
   playerPrefab: {fileID: 3743135607583839950, guid: 29d2d68046fffe24887a7f94de21ff04, type: 3}
