@@ -234,6 +234,11 @@ public class MazeContainer : MonoBehaviour
         Debug.Log("Current position is " + transform.position);
         Debug.Log("Player moved to " + this.player.transform.position);
     }
+
+    public void SetPlayerNavigationMode(int mode)
+    {
+        this.player.GetComponent<Player>().SetNavigationMode(mode);
+    }
     void SpawnGoal(int x, int y)
     {
         this.goal = Instantiate(this.goalPrefab, new Vector3((x + 0.5f) * (this.cellSize + this.wallWidth), 2f, (y + 0.5f) * (this.cellSize + this.wallWidth)), Quaternion.identity);

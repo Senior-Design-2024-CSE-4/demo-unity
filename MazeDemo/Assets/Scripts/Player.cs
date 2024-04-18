@@ -50,6 +50,9 @@ public class Player : MonoBehaviour
                 Send(surroundMode, beltMode, angle, intensity);
                 break;
             case 3:
+                Debug.Log("Path mode not implemented. Replacing with Direction Mode.");
+                angle = GetAngleToGoal();
+                Send(surroundMode, beltMode, angle, intensity);
                 break;
             default:
                 Debug.Log("Invalid navigation mode.");
@@ -79,19 +82,16 @@ public class Player : MonoBehaviour
     {
         this.maxDistance = d;
     }
-    
-    public void SetSurroundMode(int surroundMode)
+
+    public void SetNavigationMode(int navigationMode)
     {
-        this.surroundMode = surroundMode;
-    }
-    private void SetBeltMode(int beltMode)
-    {
-        this.beltMode = beltMode;
-    }
-    public void SetModes(int surroundMode, int beltMode)
-    {
-        this.surroundMode = surroundMode;
-        this.beltMode = beltMode;
+        this.navigationMode = navigationMode;
+        if (navigationMode == 1)
+        {
+            this.surroundMode = 1;
+        } else {
+            this.surroundMode = 0;
+        }
     }
 
     private int GetAngleToGoal()

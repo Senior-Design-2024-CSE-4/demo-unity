@@ -132,19 +132,23 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 894220813869314393, guid: fdb29640fa79149a4a7fffebd9819356, type: 3}
       propertyPath: m_Color.a
-      value: 0.59607846
+      value: 0.39215687
       objectReference: {fileID: 0}
     - target: {fileID: 894220813869314393, guid: fdb29640fa79149a4a7fffebd9819356, type: 3}
       propertyPath: m_Color.b
-      value: 0.29803923
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 894220813869314393, guid: fdb29640fa79149a4a7fffebd9819356, type: 3}
       propertyPath: m_Color.g
-      value: 0.29803923
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 894220813869314393, guid: fdb29640fa79149a4a7fffebd9819356, type: 3}
       propertyPath: m_Color.r
-      value: 0.29803923
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5231782658791993858, guid: fdb29640fa79149a4a7fffebd9819356, type: 3}
+      propertyPath: m_RootOrder
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5704517733405702660, guid: fdb29640fa79149a4a7fffebd9819356, type: 3}
       propertyPath: m_Name
@@ -154,6 +158,10 @@ PrefabInstance:
       propertyPath: maze
       value: 
       objectReference: {fileID: 390306578}
+    - target: {fileID: 5704517733405702661, guid: fdb29640fa79149a4a7fffebd9819356, type: 3}
+      propertyPath: optionsUI
+      value: 
+      objectReference: {fileID: 426104318}
     - target: {fileID: 5704517733405702662, guid: fdb29640fa79149a4a7fffebd9819356, type: 3}
       propertyPath: m_RootOrder
       value: 1
@@ -198,12 +206,25 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7442246285438646313, guid: fdb29640fa79149a4a7fffebd9819356, type: 3}
+      propertyPath: m_Name
+      value: PauseCanvas
+      objectReference: {fileID: 0}
+    - target: {fileID: 7554014181588709126, guid: fdb29640fa79149a4a7fffebd9819356, type: 3}
+      propertyPath: m_Color.a
+      value: 0.39215687
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: fdb29640fa79149a4a7fffebd9819356, type: 3}
 --- !u!1 &390306578 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 608375367029159035, guid: b3bf95a511a8843b2a6b248ba926a08e, type: 3}
   m_PrefabInstance: {fileID: 1374098089}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &426104318 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4006681241560975905, guid: fdb29640fa79149a4a7fffebd9819356, type: 3}
+  m_PrefabInstance: {fileID: 345567854}
   m_PrefabAsset: {fileID: 0}
 --- !u!1 &1232494224 stripped
 GameObject:

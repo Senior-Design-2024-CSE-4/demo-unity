@@ -6,8 +6,10 @@ using UnityEngine.SceneManagement;
 public class PauseMenu : MonoBehaviour
 {
     public static bool paused;
+    private bool options;
 
     public GameObject pauseUI;
+    public GameObject optionsUI;
     public GameObject maze;
     
     // Start is called before the first frame update
@@ -21,8 +23,10 @@ public class PauseMenu : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            if (PauseMenu.paused)
+            if (options)
             {
+                Back();
+            } else if (PauseMenu.paused) {
                 Resume();
             } else {
                 Pause();
@@ -44,11 +48,32 @@ public class PauseMenu : MonoBehaviour
         SceneManager.LoadScene("MainMenu");
     }
 
+    public void SelectMode(int mode)
+    {
+        maze.GetComponent<MazeContainer>().SetPlayerNavigationMode(mode);
+    }
+
+    public void OpenOptions()
+    {
+        options = true;
+        pauseUI.SetActive(false);
+        optionsUI.SetActive(true);
+    }
+
+    public void Back()
+    {
+        options = false;
+        pauseUI.SetActive(true);
+        optionsUI.SetActive(false);
+    }
+
     public void Resume()
     {
         Debug.Log("Resuming");
         pauseUI.SetActive(false);
         PauseMenu.paused = false;
+        optionsUI.SetActive(false);
+        options = false;
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
     }
@@ -58,6 +83,8 @@ public class PauseMenu : MonoBehaviour
         Debug.Log("Pausing");
         pauseUI.SetActive(true);
         PauseMenu.paused = true;
+        optionsUI.SetActive(false);
+        options = false;
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
     }
