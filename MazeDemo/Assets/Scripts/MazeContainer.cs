@@ -225,9 +225,14 @@ public class MazeContainer : MonoBehaviour
 
     void MovePlayer(int x, int y)
     {
-        this.player.transform.position = new Vector3((x + 0.5f) * (this.cellSize + this.wallWidth), 1f, (y + 0.5f) * (this.cellSize + this.wallWidth));
+        CharacterController cc = this.player.GetComponent<CharacterController>();
+        Vector3 newPosition = new Vector3((x + 0.5f) * (this.cellSize + this.wallWidth), 1f, (y + 0.5f) * (this.cellSize + this.wallWidth));
+        cc.enabled = false;
+        this.player.transform.position = newPosition;
         this.player.transform.rotation = Quaternion.identity;
-        Debug.Log("Player moved.");
+        cc.enabled = true;
+        Debug.Log("Current position is " + transform.position);
+        Debug.Log("Player moved to " + this.player.transform.position);
     }
     void SpawnGoal(int x, int y)
     {
