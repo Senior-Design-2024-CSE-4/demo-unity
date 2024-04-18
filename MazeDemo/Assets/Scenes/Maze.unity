@@ -229,6 +229,14 @@ PrefabInstance:
       propertyPath: wall
       value: 
       objectReference: {fileID: 8785952496509668523, guid: 9923e4f5b09b64714ad4c4b03aa91470, type: 3}
+    - target: {fileID: 3700445143442624002, guid: b3bf95a511a8843b2a6b248ba926a08e, type: 3}
+      propertyPath: width
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 3700445143442624002, guid: b3bf95a511a8843b2a6b248ba926a08e, type: 3}
+      propertyPath: height
+      value: 5
+      objectReference: {fileID: 0}
     - target: {fileID: 5751401292853496601, guid: b3bf95a511a8843b2a6b248ba926a08e, type: 3}
       propertyPath: m_RootOrder
       value: 0
