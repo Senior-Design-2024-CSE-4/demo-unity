@@ -10,6 +10,7 @@ public class Client
 
     private TcpClient tcpSocket;
     private Thread thread;
+    private bool readyToSend = false;
     // The rate at which the client listens to the server
     private double targetHz = 120.0;
     private double UpdateTime
@@ -23,7 +24,14 @@ public class Client
 
     public void Close()
     {
+
+        using (NetworkStream stream = tcpSocket.GetStream()) 
+        {
+            stream.Close();
+            Debug.Log("Stream closed.");
+        }
         this.tcpSocket.Close();
+            Debug.Log("Socket closed.");
     }
 
     public void SetHz(double hz)
@@ -77,7 +85,11 @@ public class Client
                         Array.Copy(buffer, 0, incommingData, 0, length); 						
                         // Convert byte array to string message. 						
                         string serverMessage = Encoding.ASCII.GetString(incommingData); 						
-                        Debug.Log("server message received as: " + serverMessage); 		
+                        Debug.Log("server message received as: " + serverMessage); 	
+                        if (serverMessage == "confirmation")
+                        {
+                            readyToSend = true;
+                        }	
                         lock (this.currentData)
                         {
                             this.currentData = serverMessage;
@@ -96,11 +108,37 @@ public class Client
         }
     }
 
+    public void SendSetup(string message)
+    {
+        if (tcpSocket == null) {             
+			return;         
+		}
+
+		try { 			
+			// Get a stream object for writing. 			
+			NetworkStream stream = tcpSocket.GetStream(); 			
+			if (stream.CanWrite) {                 				
+				// Convert string message to byte array.                 
+				byte[] clientMessageAsByteArray = Encoding.ASCII.GetBytes(message); 				
+				// Write byte array to socketConnection stream.                 
+				stream.Write(clientMessageAsByteArray, 0, clientMessageAsByteArray.Length);                 
+				Debug.Log("Client sent: " + message);             
+			}         
+		} 		
+		catch (SocketException socketException) {             
+			Debug.Log("Socket exception: " + socketException);         
+		}  
+    }
+
     public void Send(string message)
     {
         if (tcpSocket == null) {             
 			return;         
 		}
+        if (!readyToSend)
+        {
+            return;
+        }
         DateTime current_time = DateTime.Now;
         if ((current_time - this.lastsend).TotalSeconds < this.UpdateTime)
         {

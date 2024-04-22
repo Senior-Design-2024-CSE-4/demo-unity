@@ -25,6 +25,7 @@ public class Player : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        Debug.Log("New player!");
         readyToSend = false;
         ConnectToServer("127.0.0.1", 12345);
         this.surroundMode = 0;
@@ -64,6 +65,7 @@ public class Player : MonoBehaviour
 
     void OnDestroy()
     {
+        Debug.Log("Closing connection.");
         c.Close();
     }
 
@@ -71,8 +73,9 @@ public class Player : MonoBehaviour
     {
         this.c = new Client();
         this.c.Connect(host, port);
-        this.c.Send("s:unity");
-        this.c.Send("ubelt");
+        Debug.Log("Setting up connection!");
+        this.c.SendSetup("s:unity");
+        this.c.SendSetup("ubelt");
         readyToSend = true;
     }
 
