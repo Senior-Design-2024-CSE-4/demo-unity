@@ -152,11 +152,11 @@ public class Client
 				byte[] clientMessageAsByteArray = Encoding.ASCII.GetBytes(message); 				
 				// Write byte array to socketConnection stream.                 
 				stream.Write(clientMessageAsByteArray, 0, clientMessageAsByteArray.Length);                 
-				Debug.Log("Client sent: " + message);             
+				Debug.Log("CLIENT SENT: " + message);             
 			}         
 		} 		
 		catch (SocketException socketException) {             
-			Debug.Log("Socket exception: " + socketException);         
+			Debug.LogError("Socket exception: " + socketException);         
 		}  
     }
 }

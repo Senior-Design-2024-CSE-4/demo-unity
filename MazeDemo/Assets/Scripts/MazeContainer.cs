@@ -31,6 +31,9 @@ public class MazeContainer : MonoBehaviour
     // Data
     private MazeData data;
     private MazeGenerationFunction gen;
+    private int[] distanceArray; 
+    private (int, int) goalLocation;
+    private bool mazeReady = false;
     
     // Start is called before the first frame update
     void Start()
@@ -39,12 +42,40 @@ public class MazeContainer : MonoBehaviour
         Debug.Log("Floor generated.");
         RenderCeiling();
         Debug.Log("Ceiling generated.");
-        GenerateMaze();
         SpawnPlayer(0, 0);
-        SpawnGoal(this.width - 1, this.height - 1);
-        this.player.GetComponent<Player>().SetGoal(this.goal.transform);
-        Vector3 distance = new Vector3((cellSize + wallWidth) * this.width + wallWidth, 0, (cellSize + wallWidth) * this.height + wallWidth);
-        this.player.GetComponent<Player>().SetMaxDistance(distance.magnitude);
+        this.goalLocation = (this.width - 1, this.height - 1);
+        SpawnGoal(this.goalLocation.Item1, this.goalLocation.Item2);
+        GenerateMaze();
+        this.distanceArray = this.gen.GetDistanceArray(this.goalLocation.Item1, this.goalLocation.Item2);
+        this.mazeReady = true;
+    }
+
+    void Update()
+    {
+        if (this.mazeReady)
+        {
+            SetNextCell();
+        }
+    }
+
+    void SetNextCell()
+    {
+        float squaresize = this.cellSize + this.wallWidth;
+        // z is the y in a bird's eye view
+        int player_x = Mathf.FloorToInt(this.player.transform.position.x / squaresize);
+        int player_y = Mathf.FloorToInt(this.player.transform.position.z / squaresize);
+        Debug.Log("PLAYER COORDINATES:" + player_x + ", " + player_y);
+        List<int> neighbors = this.gen.GetOpenNeighbors(this.gen.Point2Index(player_x, player_y));
+        int current_distance = this.distanceArray[this.gen.Point2Index(player_x, player_y)];
+        Debug.Log("PLAYER DISTANCE: " + current_distance);
+        foreach(int neighbor in neighbors)
+        {
+            if (this.distanceArray[neighbor] == current_distance - 1)
+            {
+                Debug.Log("GO TO: " + this.gen.Index2Point(neighbor));
+                this.player.GetComponent<Player>().SetNearestSquare(GetSquarePosition(this.gen.Index2Point(neighbor)));
+            }
+        }
     }
 
     void ClearMaze()
@@ -65,21 +96,31 @@ public class MazeContainer : MonoBehaviour
 
     public void RestartMaze()
     {
+        this.mazeReady = false;
         ClearMaze();
         GenerateMaze();
-        MovePlayer(0, 0);
+        this.mazeReady = true;
     }
 
     void GenerateMaze() 
     {
         this.data = new MazeData(this.width, this.height);
-        this.gen = new DFSGeneration();
+        this.gen = new MazeGenerationFunction();
         gen.Generate(this.data, 0, 0);
+        this.goalLocation = (this.width - 1, this.height - 1);
+        this.distanceArray = this.gen.GetDistanceArray(this.goalLocation.Item1, this.goalLocation.Item2);
         Debug.Log("Maze generated.");
         RenderPosts();
         Debug.Log("Posts rendered.");
         RenderWalls();
         Debug.Log("Walls rendered.");
+        MoveGoal(this.goalLocation.Item1, this.goalLocation.Item2);
+        Debug.Log("Goal rendered.");
+        MovePlayer(0, 0);
+        Debug.Log("Player rendered.");
+        this.player.GetComponent<Player>().SetGoal(this.goal.transform);
+        Vector3 distance = new Vector3((cellSize + wallWidth) * this.width + wallWidth, 0, (cellSize + wallWidth) * this.height + wallWidth);
+        this.player.GetComponent<Player>().SetMaxDistance(distance.magnitude);
     }
 
     public void IncreaseLevel()
@@ -91,7 +132,6 @@ public class MazeContainer : MonoBehaviour
         RenderFloor();
         Destroy(this.ceiling);
         RenderCeiling();
-        MoveGoal(this.width - 1, this.height - 1);
         RestartMaze();
     }
 
@@ -216,6 +256,13 @@ public class MazeContainer : MonoBehaviour
         } else {
             Debug.Log("Renderer not found.");
         }
+    }
+
+    public Vector3 GetSquarePosition((int, int) coords)
+    {
+        float x = coords.Item1 * (this.wallWidth + this.cellSize) + this.wallWidth + this.cellSize / 2;
+        float z = coords.Item2 * (this.wallWidth + this.cellSize) + this.wallWidth + this.cellSize / 2;
+        return new Vector3(x, 0, z);
     }
 
     void SpawnPlayer(int x, int y)

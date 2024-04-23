@@ -9,6 +9,7 @@ public class Player : MonoBehaviour
     private bool readyToSend;
 
     private Vector3 goal;
+    private Vector3 nearestSquareToGoal;
     private float maxDistance;
 
     // 0 is for single direction, 1 is for all direction
@@ -41,7 +42,7 @@ public class Player : MonoBehaviour
         switch (this.navigationMode)
         {
             case 0:
-                angle = GetAngleToGoal();
+                angle = GetAngleToPosition(this.goal);
                 Send(surroundMode, beltMode, angle, intensity);
                 break;
             case 1:
@@ -54,7 +55,7 @@ public class Player : MonoBehaviour
                 break;
             case 3:
                 Debug.Log("Path mode not implemented. Replacing with Direction Mode.");
-                angle = GetAngleToGoal();
+                angle = GetAngleToPosition(this.nearestSquareToGoal);
                 Send(surroundMode, beltMode, angle, intensity);
                 break;
             default:
@@ -84,6 +85,11 @@ public class Player : MonoBehaviour
         this.goal = t.position;
     }
 
+    public void SetNearestSquare(Vector3 pos)
+    {
+        this.nearestSquareToGoal = pos;
+    }
+
     public void SetMaxDistance(float d)
     {
         this.maxDistance = d;
@@ -100,10 +106,10 @@ public class Player : MonoBehaviour
         }
     }
 
-    private int GetAngleToGoal()
+    private int GetAngleToPosition(Vector3 targetPos)
     {
         Vector3 forward = this.gameObject.transform.forward;
-        Vector3 targetDir = goal - this.gameObject.transform.position;
+        Vector3 targetDir = targetPos - this.gameObject.transform.position;
         float angle = Vector3.Angle(targetDir, forward);
         if (Vector3.Cross(forward, targetDir).y < 0)
         {
@@ -165,10 +171,11 @@ public class Player : MonoBehaviour
             return;
         }
 
-        Debug.Log(surround + "," + mode + "," + angle.ToString("000") + "," + intensity.ToString("000"));
+        string sendingString = surround + "," + mode + "," + angle.ToString("000") + "," + intensity.ToString("000");
+        Debug.Log("PLAYER MESSAGE: " + sendingString);
         if (readyToSend)
         {
-            c.Send(surround + "," + mode + "," + angle.ToString("000") + "," + intensity.ToString("000"));
+            c.Send(sendingString);
         }
 
     }

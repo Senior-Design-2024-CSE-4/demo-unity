@@ -4,21 +4,15 @@ using System.Collections.Generic;
 using UnityEngine;
 using Random=UnityEngine.Random;
 
-public abstract class MazeGenerationFunction
+public class MazeGenerationFunction
 {   
-    // Start is called before the first frame update
-    public abstract void Generate(MazeData maze, int startX, int startY);
-}
-
-public class DFSGeneration: MazeGenerationFunction
-{
     private int h = 0;
     private int w = 0;
     private int[] cells = new int[1];
 
     MazeData maze;
     
-    public override void Generate(MazeData maze, int startX, int startY)
+    public void Generate(MazeData maze, int startX, int startY)
     {
         this.h = maze.GetHeight();
         this.w = maze.GetWidth();
@@ -34,7 +28,7 @@ public class DFSGeneration: MazeGenerationFunction
         {
             int cell = stack.Pop();
             Debug.Log("Examining cell " + cell);
-            List<int> neighbors = GetNeighbors(cell);
+            List<int> neighbors = GetUnusedNeighbors(cell);
             Debug.Log(neighbors.Count);
             if (neighbors.Count > 0)
             {
@@ -87,17 +81,44 @@ public class DFSGeneration: MazeGenerationFunction
         Debug.Log("Error! Points are the same, somehow.");
     }
 
-    private int Point2Index(int x, int y)
+    public int Point2Index(int x, int y)
     {
         return y * this.w + x;
     }
 
-    private (int, int) Index2Point(int index)
+    public (int, int) Index2Point(int index)
     {
         return (index % this.w, index / this.h);
     }
 
-    private List<int> GetNeighbors(int index)
+    public List<int> GetOpenNeighbors(int index)
+    {
+        (int, int) coords = Index2Point(index);
+        int x = coords.Item1;
+        int y = coords.Item2;
+        List<int> neighbors = new List<int>();
+        
+        if (this.maze.ValidCoordinate(x, y + 1) && this.maze.GetTopWall(x, y) == 0)
+        {
+            neighbors.Add(Point2Index(x, y + 1));
+        }
+        if (this.maze.ValidCoordinate(x + 1, y) && this.maze.GetRightWall(x, y) == 0)
+        {
+            neighbors.Add(Point2Index(x + 1, y));
+        }
+        if (this.maze.ValidCoordinate(x, y - 1) && this.maze.GetBottomWall(x, y) == 0)
+        {
+            neighbors.Add(Point2Index(x, y - 1));
+        }
+        if (this.maze.ValidCoordinate(x - 1, y) && this.maze.GetLeftWall(x, y) == 0)
+        {
+            neighbors.Add(Point2Index(x - 1, y));
+        }
+
+        return neighbors;
+    }
+
+    private List<int> GetUnusedNeighbors(int index)
     {
         (int, int) coords = Index2Point(index);
         int x = coords.Item1;
@@ -127,5 +148,41 @@ public class DFSGeneration: MazeGenerationFunction
     private bool ValidCell(int x, int y)
     {
         return this.maze.ValidCoordinate(x, y) && (this.cells[Point2Index(x, y)] == 0);
+    }
+
+    public int[] GetDistanceArray(int x, int y)
+    {
+        int[] cells = new int[this.h * this.w];
+        
+        if (this.maze.ValidCoordinate(x, y))
+        {
+            Queue<int> queue = new Queue<int>();
+            queue.Enqueue(Point2Index(x, y));
+            cells[Point2Index(x, y)] = 1;
+
+            while (queue.Count > 0)
+            {
+                int cell = queue.Dequeue();
+                List<int> neighbors = GetOpenNeighbors(cell);
+                foreach (int neighbor in neighbors)
+                {
+                    if (cells[neighbor] == 0 || cells[neighbor] > cells[cell])
+                    {
+                        cells[neighbor] = cells[cell] + 1;
+                        queue.Enqueue(neighbor);
+                    }
+                }
+            }
+        } else {
+            Debug.LogError("Attempting to generate distance array from invalid point (" + x + "," + y + ").");
+        }
+
+        foreach (int cell in cells)
+        {
+            Debug.Log("CELL: " + cell);
+        }
+        
+        return cells;
+
     }
 }
