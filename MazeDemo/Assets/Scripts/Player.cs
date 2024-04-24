@@ -5,12 +5,18 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
-    Client c;
-    private bool readyToSend;
+
+    /// <summary>
+    /// Goal-tracking variables
+    /// </summary>
 
     private Vector3 goal;
     private Vector3 nearestSquareToGoal;
     private float maxDistance;
+
+    /// <summary>
+    /// Player settings
+    /// </summary>
 
     // 0 is for single direction, 1 is for all direction
     private int surroundMode;
@@ -23,6 +29,12 @@ public class Player : MonoBehaviour
     // 3: pathfinding
     private int navigationMode;
     
+    /// <summary>
+    /// Client variables
+    /// </summary>
+    Client c;
+    private bool readyToSend;
+    
     // Start is called before the first frame update
     void Start()
     {
@@ -31,7 +43,7 @@ public class Player : MonoBehaviour
         ConnectToServer("127.0.0.1", 12345);
         this.surroundMode = 0;
         this.beltMode = 1;
-        this.navigationMode = 0;
+        this.navigationMode = 3;
     }
 
     // Update is called once per frame
@@ -80,9 +92,9 @@ public class Player : MonoBehaviour
         readyToSend = true;
     }
 
-    public void SetGoal(Transform t)
+    public void SetGoal(Vector3 pos)
     {
-        this.goal = t.position;
+        this.goal = pos;
     }
 
     public void SetNearestSquare(Vector3 pos)
