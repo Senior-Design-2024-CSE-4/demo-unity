@@ -247,14 +247,14 @@ public class MazeContainer : MonoBehaviour
     void SpawnGoal((int, int) coords)
     {
         this.goalLocation = coords;
-        this.goal = Instantiate(this.goalPrefab, new Vector3((coords.Item1 + 0.5f) * this.squareWidth, 2f, (coords.Item2 + 0.5f) * this.squareWidth), Quaternion.identity);
+        this.goal = Instantiate(this.goalPrefab, new Vector3((coords.Item1 + 0.5f) * this.squareWidth, 1f, (coords.Item2 + 0.5f) * this.squareWidth), Quaternion.identity);
     }
     void MoveGoal((int, int) coords)
     {
         Debug.Log("MOVEGOAL: new position " + coords);
         this.goalLocation = coords;
         Vector3 newPosition = GetSquareCenter(coords);
-        newPosition.y += 2f;
+        newPosition.y += 1f;
         this.goal.transform.position = newPosition;
         this.player.GetComponent<Player>().SetGoal(this.goal.transform.position);
     }
