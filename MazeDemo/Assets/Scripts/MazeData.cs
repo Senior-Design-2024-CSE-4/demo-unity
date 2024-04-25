@@ -6,6 +6,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Random=UnityEngine.Random;
 
 public class MazeData
 {
@@ -41,9 +42,11 @@ public class MazeData
     }
 
     // Makes sure a given coordinate is a point within this maze.
-    public bool ValidCoordinate(int x, int y)
+    public bool ValidCoordinate((int, int) coords)
     {
-        return (x >= 0 && x < this.width) && (y >= 0 && y < this.height);
+        bool valid_x = coords.Item1 >= 0 && coords.Item1 < this.width;
+        bool valid_y = coords.Item2 >= 0 && coords.Item2 < this.height;
+        return valid_x && valid_y;
     }
 
     // Size getters/setters
@@ -58,79 +61,110 @@ public class MazeData
     }
 
     // Wall getters/setters
-    public int? GetLeftWall(int x, int y)
+    public int? GetLeftWall((int, int) coords)
     {
-        if (ValidCoordinate(x, y))
+        if (ValidCoordinate(coords))
         {
+            int x = coords.Item1;
+            int y = coords.Item2;
             return this.vertical[(this.width + 1) * y + x];
         }
         // return null if coordinate is not valid
+        Debug.LogError("Attempting to get invalid coordinate " + coords);
         return null;
     }
 
-    public void SetLeftWall(int x, int y, int val)
+    public void SetLeftWall((int, int) coords, int val)
     {
-        if (ValidCoordinate(x, y))
+        if (ValidCoordinate(coords))
         {
+            int x = coords.Item1;
+            int y = coords.Item2;
             this.vertical[(this.width + 1) * y + x] = val;
+        } else {
+            Debug.LogError("Attempting to set invalid coordinate " + coords);
         }
-        Debug.Log("Cannot set coordinate (" + x + ", " + y + "); point is not valid.");
     }
 
-    public int? GetRightWall(int x, int y)
+    public int? GetRightWall((int, int) coords)
     {
-        if (ValidCoordinate(x, y))
+        if (ValidCoordinate(coords))
         {
+            int x = coords.Item1;
+            int y = coords.Item2;
             return this.vertical[(this.width + 1) * y + x + 1];
         }
         // return null if coordinate is not valid
+        Debug.LogError("Attempting to get invalid coordinate " + coords);
         return null;
     }
 
-    public void SetRightWall(int x, int y, int val)
+    public void SetRightWall((int, int) coords, int val)
     {
-        if (ValidCoordinate(x, y))
+        if (ValidCoordinate(coords))
         {
+            int x = coords.Item1;
+            int y = coords.Item2;
             this.vertical[(this.width + 1) * y + x + 1] = val;
+        } else {
+            Debug.LogError("Attempting to set invalid coordinate " + coords);
         }
-        Debug.Log("Cannot set coordinate (" + x + ", " + y + "); point is not valid.");
     }
 
-    public int? GetTopWall(int x, int y)
+    public int? GetTopWall((int, int) coords)
     {
-        if (ValidCoordinate(x, y))
+        if (ValidCoordinate(coords))
         {
+            int x = coords.Item1;
+            int y = coords.Item2;
             return this.horizontal[(y + 1) * this.width + x];
         }
         // return null if coordinate is not valid
+        Debug.LogError("Attempting to get invalid coordinate " + coords);
         return null;
     }
 
-    public void SetTopWall(int x, int y, int val)
+    public void SetTopWall((int, int) coords, int val)
     {
-        if (ValidCoordinate(x, y))
+        if (ValidCoordinate(coords))
         {
+            int x = coords.Item1;
+            int y = coords.Item2;
             this.horizontal[(y + 1) * this.width + x] = val;
+        } else {
+            Debug.LogError("Attempting to set invalid coordinate " + coords);
         }
-        Debug.Log("Cannot set coordinate (" + x + ", " + y + "); point is not valid.");
     }
 
-    public int? GetBottomWall(int x, int y)
+    public int? GetBottomWall((int, int) coords)
     {
-        if (ValidCoordinate(x, y))
+        if (ValidCoordinate(coords))
         {
+            int x = coords.Item1;
+            int y = coords.Item2;
             return this.horizontal[y * this.width + x];
         }
         // return null if coordinate is not valid
+        Debug.LogError("Attempting to get invalid coordinate " + coords);
         return null;
     }
 
-    public void SetBottomWall(int x, int y, int val)
+    public void SetBottomWall((int, int) coords, int val)
     {
-        if (ValidCoordinate(x, y))
+        if (ValidCoordinate(coords))
         {
+            int x = coords.Item1;
+            int y = coords.Item2;
             this.horizontal[y * this.width + x] = val;
+        } else {
+            Debug.LogError("Attempting to set invalid coordinate " + coords);
         }
-        Debug.Log("Cannot set coordinate (" + x + ", " + y + "); point is not valid.");
+    }
+
+    public (int, int) RandomPoint()
+    {
+        int x = Random.Range(0, this.width);
+        int y = Random.Range(0, this.height);
+        return (x, y);
     }
 }

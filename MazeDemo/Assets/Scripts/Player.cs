@@ -66,7 +66,6 @@ public class Player : MonoBehaviour
                 Send(surroundMode, beltMode, angle, intensity);
                 break;
             case 3:
-                Debug.Log("Path mode not implemented. Replacing with Direction Mode.");
                 angle = GetAngleToPosition(this.nearestSquareToGoal);
                 Send(surroundMode, beltMode, angle, intensity);
                 break;

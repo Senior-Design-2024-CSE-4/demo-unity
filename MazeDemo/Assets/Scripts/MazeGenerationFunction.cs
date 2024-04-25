@@ -8,82 +8,79 @@ public class MazeGenerationFunction
 {   
     private int h = 0;
     private int w = 0;
-    private int[] cells = new int[1];
+    private int[,] cells;
 
     MazeData maze;
     
-    public void Generate(MazeData maze, int startX, int startY)
+    public void Generate(MazeData maze, (int, int) start)
     {
         this.h = maze.GetHeight();
         this.w = maze.GetWidth();
         this.maze = maze;
 
-        this.cells = new int[this.h * this.w];
+        this.cells = new int[this.w, this.h];
 
-        Stack<int> stack = new Stack<int>();
-        stack.Push(Point2Index(startX, startY));
-        this.cells[Point2Index(startX, startY)] = 1;
+        Stack<(int, int)> stack = new Stack<(int, int)>();
+        stack.Push(start);
+        this.cells[start.Item1, start.Item2] = 1;
 
         while (stack.Count > 0)
         {
-            int cell = stack.Pop();
+            (int, int) cell = stack.Pop();
             Debug.Log("Examining cell " + cell);
-            List<int> neighbors = GetUnusedNeighbors(cell);
+            List<(int, int)> neighbors = GetUnusedNeighbors(cell);
             Debug.Log(neighbors.Count);
             if (neighbors.Count > 0)
             {
                 stack.Push(cell);
                 int index = Random.Range(0, neighbors.Count);
-                stack.Push(neighbors[index]);
-                this.cells[neighbors[index]] = 1;
-                Debug.Log("Adding cell " + neighbors[index]);
+                (int, int) neighbor = neighbors[index];
+                stack.Push(neighbor);
+                this.cells[neighbor.Item1, neighbor.Item2] = 1;
+                Debug.Log("Adding cell " + neighbor);
                 RemoveWall(cell, neighbors[index]);
             }
         }
     }
 
-    private void RemoveWall(int c1, int c2)
+    private void RemoveWall((int, int) p1, (int, int) p2)
     {
-        (int, int) p1 = Index2Point(c1);
-        Debug.Log(p1);
-        (int, int) p2 = Index2Point(c2);
-        Debug.Log(p2);
 
         if (p2.Item2 > p1.Item2)
         {
-            Debug.Log("TOP " + p1.Item1 + " " + p1.Item2);
-            this.maze.SetTopWall(p1.Item1, p1.Item2, 0);
+            Debug.Log("REMOVE WALL: TOP " + p1);
+            this.maze.SetTopWall(p1, 0);
             return;
         }
 
         if (p2.Item2 < p1.Item2)
         {
-            Debug.Log("BOTTOM " + p1.Item1 + " " + p1.Item2);
-            this.maze.SetBottomWall(p1.Item1, p1.Item2, 0);
+            Debug.Log("REMOVE WALL: BOTTOM " + p1);
+            this.maze.SetBottomWall(p1, 0);
             return;
         }
 
         if (p2.Item1 > p1.Item1)
         {
-            Debug.Log("RIGHT " + p1.Item1 + " " + p1.Item2);
-            this.maze.SetRightWall(p1.Item1, p1.Item2, 0);
+            Debug.Log("REMOVE WALL: RIGHT " + p1);
+            this.maze.SetRightWall(p1, 0);
             return;
         }
 
         if (p2.Item1 < p1.Item1)
         {
 
-            Debug.Log("LEFT " + p1.Item1 + " " + p1.Item2);
-            this.maze.SetLeftWall(p1.Item1, p1.Item2, 0);
+            Debug.Log("REMOVE WALL: LEFT " + p1);
+            this.maze.SetLeftWall(p1, 0);
             return;
         }
 
-        Debug.Log("Error! Points are the same, somehow.");
+        Debug.LogError("REMOVE WALL: Points are the same somehow.");
     }
 
-    public int Point2Index(int x, int y)
+    public int Point2Index((int, int) point)
     {
-        return y * this.w + x;
+        return point.Item2 * this.w + point.Item1;
     }
 
     public (int, int) Index2Point(int index)
@@ -91,98 +88,87 @@ public class MazeGenerationFunction
         return (index % this.w, index / this.h);
     }
 
-    public List<int> GetOpenNeighbors(int index)
+    public List<(int, int)> GetOpenNeighbors((int, int) coords)
     {
-        (int, int) coords = Index2Point(index);
         int x = coords.Item1;
         int y = coords.Item2;
-        List<int> neighbors = new List<int>();
-        
-        if (this.maze.ValidCoordinate(x, y + 1) && this.maze.GetTopWall(x, y) == 0)
+        List<(int, int)> neighbors = new List<(int, int)>();
+        (int, int) left = (x - 1, y);
+        (int, int) right = (x + 1, y);
+        (int, int) down = (x, y - 1);
+        (int, int) up = (x, y + 1);
+
+        if (this.maze.ValidCoordinate(left) && this.maze.GetLeftWall(coords) == 0) { neighbors.Add(left); }
+        if (this.maze.ValidCoordinate(right) && this.maze.GetRightWall(coords) == 0) { neighbors.Add(right); }
+        if (this.maze.ValidCoordinate(down) && this.maze.GetBottomWall(coords) == 0) { neighbors.Add(down); }
+        if (this.maze.ValidCoordinate(up) && this.maze.GetTopWall(coords) == 0) { neighbors.Add(up); }
+
+        Debug.Log("OPEN NEIGHBORS: neighbors for " + coords);
+        foreach ((int, int) neighbor in neighbors)
         {
-            neighbors.Add(Point2Index(x, y + 1));
-        }
-        if (this.maze.ValidCoordinate(x + 1, y) && this.maze.GetRightWall(x, y) == 0)
-        {
-            neighbors.Add(Point2Index(x + 1, y));
-        }
-        if (this.maze.ValidCoordinate(x, y - 1) && this.maze.GetBottomWall(x, y) == 0)
-        {
-            neighbors.Add(Point2Index(x, y - 1));
-        }
-        if (this.maze.ValidCoordinate(x - 1, y) && this.maze.GetLeftWall(x, y) == 0)
-        {
-            neighbors.Add(Point2Index(x - 1, y));
-        }
+            Debug.Log("OPEN NEIGHBORS: " + neighbor);
+        } 
 
         return neighbors;
     }
 
-    private List<int> GetUnusedNeighbors(int index)
+    private List<(int, int)> GetUnusedNeighbors((int, int) coords)
     {
-        (int, int) coords = Index2Point(index);
         int x = coords.Item1;
         int y = coords.Item2;
-        List<int> neighbors = new List<int>();
-        
-        if (ValidCell(x, y + 1))
-        {
-            neighbors.Add(Point2Index(x, y + 1));
-        }
-        if (ValidCell(x + 1, y))
-        {
-            neighbors.Add(Point2Index(x + 1, y));
-        }
-        if (ValidCell(x, y - 1))
-        {
-            neighbors.Add(Point2Index(x, y - 1));
-        }
-        if (ValidCell(x - 1, y))
-        {
-            neighbors.Add(Point2Index(x - 1, y));
-        }
+        List<(int, int)> neighbors = new List<(int, int)>();
+        (int, int) left = (x - 1, y);
+        (int, int) right = (x + 1, y);
+        (int, int) down = (x, y - 1);
+        (int, int) up = (x, y + 1);
+        if (ValidCell(left)) { neighbors.Add(left); }
+        if (ValidCell(right)) { neighbors.Add(right); }
+        if (ValidCell(down)) { neighbors.Add(down); }
+        if (ValidCell(up)) { neighbors.Add(up); }
 
         return neighbors;
     }
 
-    private bool ValidCell(int x, int y)
+    private bool ValidCell((int, int) coords)
     {
-        return this.maze.ValidCoordinate(x, y) && (this.cells[Point2Index(x, y)] == 0);
+        return this.maze.ValidCoordinate(coords) && (this.cells[coords.Item1, coords.Item2] == 0);
     }
 
-    public int[] GetDistanceArray(int x, int y)
+    public int[,] GetDistanceArray((int, int) goal)
     {
-        int[] cells = new int[this.h * this.w];
+        int[,] distanceCells = new int[this.w, this.h];
         
-        if (this.maze.ValidCoordinate(x, y))
+        if (this.maze.ValidCoordinate(goal))
         {
-            Queue<int> queue = new Queue<int>();
-            queue.Enqueue(Point2Index(x, y));
-            cells[Point2Index(x, y)] = 1;
+            Queue<(int, int)> queue = new Queue<(int, int)>();
+            queue.Enqueue(goal);
+            distanceCells[goal.Item1, goal.Item2] = 1;
 
             while (queue.Count > 0)
             {
-                int cell = queue.Dequeue();
-                List<int> neighbors = GetOpenNeighbors(cell);
-                foreach (int neighbor in neighbors)
+                (int, int) cell = queue.Dequeue();
+                Debug.Log("DISTANCE ARRAY: checking " +  cell);
+                int cellDistance = distanceCells[cell.Item1, cell.Item2];
+                Debug.Log("DISTANCE ARRAY: cell distance " +  cellDistance);
+                List<(int, int)> neighbors = GetOpenNeighbors(cell);
+                foreach ((int, int) neighbor in neighbors)
                 {
-                    if (cells[neighbor] == 0 || cells[neighbor] > cells[cell])
+                    Debug.Log("DISTANCE ARRAY: checking neighbor " + neighbor);
+                    int neighborDistance = distanceCells[neighbor.Item1, neighbor.Item2];
+                    if (neighborDistance == 0 || neighborDistance > cellDistance)
                     {
-                        cells[neighbor] = cells[cell] + 1;
+                        Debug.Log("DISTANCE ARRAY: adding distance for " + neighbor);
+                        Debug.Log("DISTANCE ARRAY: new distance " + (cellDistance + 1));
+                        distanceCells[neighbor.Item1, neighbor.Item2] = cellDistance + 1;
                         queue.Enqueue(neighbor);
                     }
                 }
             }
         } else {
-            Debug.LogError("Attempting to generate distance array from invalid point (" + x + "," + y + ").");
-        }
-
-        foreach (int cell in cells)
-        {
-            Debug.Log("CELL: " + cell);
+            Debug.LogError("DISTANCE ARRAY: Bad goal " + goal);
         }
         
-        return cells;
+        return distanceCells;
 
     }
 }

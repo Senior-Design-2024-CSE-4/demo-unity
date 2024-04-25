@@ -54,6 +54,20 @@ public class MazeContainer : MonoBehaviour
             return this.cellSize + this.wallWidth;
         }
     }
+    private float mazeWidth
+    {
+        get
+        {
+            return this.squareWidth * this.width + this.wallWidth;
+        }
+    }
+    private float mazeHeight
+    {
+        get
+        {
+            return this.squareWidth * this.height + this.wallWidth;
+        }
+    }
 
     /// <summary>
     /// Data variables - holds relevant information regarding the maze state
@@ -66,7 +80,7 @@ public class MazeContainer : MonoBehaviour
     private MazeGenerationFunction gen;
 
     // An array that contains the distances from every square to the goal.
-    private int[] distanceArray; 
+    private int[,] distanceArray; 
     private (int, int) goalLocation;
     private (int, int) playerPosition;
     
@@ -124,17 +138,25 @@ public class MazeContainer : MonoBehaviour
     void SetNextCell()
     {
         (int, int) playerCoords = GetPlayerPosition();
+        Debug.Log("PLAYER COORDS: " + playerCoords);
         int player_x = playerCoords.Item1;
         int player_y = playerCoords.Item2;
-        List<int> neighbors = this.gen.GetOpenNeighbors(this.gen.Point2Index(player_x, player_y));
-        int current_distance = this.distanceArray[this.gen.Point2Index(player_x, player_y)];
+        List<(int, int)> neighbors = this.gen.GetOpenNeighbors(playerCoords);
+        int current_distance = this.distanceArray[playerCoords.Item1, playerCoords.Item2];
         Debug.Log("PLAYER DISTANCE: " + current_distance);
-        foreach(int neighbor in neighbors)
+
+        if (current_distance == 1)
         {
-            if (this.distanceArray[neighbor] == current_distance - 1)
+            Debug.Log("GO TO: you are at the goal (~:");
+            return;
+        }
+
+        foreach((int, int) neighbor in neighbors)
+        {
+            if (this.distanceArray[neighbor.Item1, neighbor.Item2] == current_distance - 1)
             {
-                Debug.Log("GO TO: " + this.gen.Index2Point(neighbor));
-                this.player.GetComponent<Player>().SetNearestSquare(GetSquareCenter(this.gen.Index2Point(neighbor)));
+                Debug.Log("GO TO: " + neighbor);
+                this.player.GetComponent<Player>().SetNearestSquare(GetSquareCenter(neighbor));
             }
         }
     }
@@ -173,17 +195,10 @@ public class MazeContainer : MonoBehaviour
     void GenerateMaze() 
     {
         this.data = new MazeData(this.width, this.height);
-        this.gen = new MazeGenerationFunction();
-        gen.Generate(this.data, 0, 0);
-        this.distanceArray = this.gen.GetDistanceArray(this.goalLocation.Item1, this.goalLocation.Item2);
-        RenderFloor();
-        RenderCeiling();
-        RenderPosts();
-        RenderWalls();
-        MovePlayer((0, 0));
-        MoveGoal((this.width - 1, this.height - 1));
-        this.player.GetComponent<Player>().SetGoal(this.goal.transform.position);
-        Vector3 distance = new Vector3(this.squareWidth * this.width + wallWidth, 0, this.squareWidth * this.height + wallWidth);
+        gen.Generate(this.data, this.data.RandomPoint());
+        RenderMaze();
+        this.distanceArray = this.gen.GetDistanceArray(this.goalLocation);
+        Vector3 distance = new Vector3(this.mazeWidth, 0, this.mazeHeight);
         this.player.GetComponent<Player>().SetMaxDistance(distance.magnitude);
     }
 
@@ -201,8 +216,11 @@ public class MazeContainer : MonoBehaviour
     
     void InitializeMazeContainer()
     {
+        // Spawn in necessary objects
         SpawnPlayer((0, 0));
         SpawnGoal((this.width - 1, this.height - 1));
+        // Initialize maze generator
+        this.gen = new MazeGenerationFunction();
     }
 
     void SpawnPlayer((int, int) coords)
@@ -233,10 +251,22 @@ public class MazeContainer : MonoBehaviour
     }
     void MoveGoal((int, int) coords)
     {
+        Debug.Log("MOVEGOAL: new position " + coords);
         this.goalLocation = coords;
         Vector3 newPosition = GetSquareCenter(coords);
         newPosition.y += 2f;
+        this.goal.transform.position = newPosition;
         this.player.GetComponent<Player>().SetGoal(this.goal.transform.position);
+    }
+
+    void RenderMaze()
+    {
+        RenderFloor();
+        RenderCeiling();
+        RenderPosts();
+        RenderWalls();
+        MovePlayer((0, 0));
+        MoveGoal((this.width - 1, this.height - 1));
     }
 
     void RenderFloor()
@@ -281,7 +311,8 @@ public class MazeContainer : MonoBehaviour
         {
             for (int y = 0; y < this.height; y++)
             {
-                if (y == 0 && this.data.GetBottomWall(x, y) != 0)
+                (int, int) coords = (x, y);
+                if (y == 0 && this.data.GetBottomWall(coords) != 0)
                 {
                     Vector3 position = new Vector3((x + 0.5f) * this.squareWidth, this.wallHeight / 2, y * this.squareWidth);
                     Vector3 scale = new Vector3(this.cellSize, this.wallHeight, this.wallWidth);
@@ -289,7 +320,7 @@ public class MazeContainer : MonoBehaviour
                     this.horizontals[y * this.width + x].transform.localScale = scale;
                     RenderWallTexture(this.horizontals[y * this.width + x].GetComponentInChildren<MeshRenderer>(), scale);
                 }
-                if (x == 0 && this.data.GetLeftWall(x, y) != 0)
+                if (x == 0 && this.data.GetLeftWall(coords) != 0)
                 {
                     Vector3 position =  new Vector3(x * this.squareWidth, this.wallHeight / 2, (y + 0.5f) * this.squareWidth);
                     Vector3 scale = new Vector3(this.wallWidth, this.wallHeight, this.cellSize);
@@ -297,7 +328,7 @@ public class MazeContainer : MonoBehaviour
                     this.verticals[(this.width + 1) * y + x].transform.localScale = scale;
                     RenderWallTexture(this.verticals[(this.width + 1) * y + x].GetComponentInChildren<MeshRenderer>(), scale);
                 }
-                if (this.data.GetTopWall(x, y) != 0)
+                if (this.data.GetTopWall(coords) != 0)
                 {
                     Vector3 position = new Vector3((x + 0.5f) * this.squareWidth, this.wallHeight / 2, (y + 1) * this.squareWidth);
                     Vector3 scale = new Vector3(this.cellSize, this.wallHeight, this.wallWidth);
@@ -305,7 +336,7 @@ public class MazeContainer : MonoBehaviour
                     this.horizontals[(y + 1) * this.width + x].transform.localScale = scale;
                     RenderWallTexture(this.horizontals[(y + 1) * this.width + x].GetComponentInChildren<MeshRenderer>(), scale);
                 }
-                if (this.data.GetRightWall(x, y) != 0)
+                if (this.data.GetRightWall(coords) != 0)
                 {
                     Vector3 position = new Vector3((x + 1) * this.squareWidth, this.wallHeight / 2, (y + 0.5f) * this.squareWidth);
                     Vector3 scale = new Vector3(this.wallWidth, this.wallHeight, this.cellSize);
